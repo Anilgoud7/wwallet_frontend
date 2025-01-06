@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faTwitter, faLinkedin, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import './App.css'; 
 import logo from '../assests/Logo.png'
+import anil from '../assests/anil.png'
+import work from '../assests/workimage1.jpg'
+import workwallet from '../assests/workwallet.png'
+import Blog from '../Components/blog'
+import Plan from '../Components/plan'
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 
-const App = () => {
+
+
+const MainContent = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 const [menuActive, setMenuActive] = useState(false);
 
 const toggleMenu = () => {
@@ -20,11 +31,12 @@ const handleSmoothScroll = (e, targetId) => {
     }
 };
 
+
 return (
     <div>
     <nav className="navbar">
             <div className="logo">
-                <img src={logo} />
+                <img src={logo} alt='logo'/>
             </div>
         <div className={`nav-links ${menuActive ? 'active' : ''}`}>
         <a href="#vision" onClick={(e) => handleSmoothScroll(e, 'vision')}>Vision</a>
@@ -41,29 +53,30 @@ return (
 
     <section className="hero" id="about">
         <div className="hero-content">
-        <h1>A steady salary is a reminder that small, consistent steps can lead to long-term success.</h1>
-        <p>Keep track of receivables and payables. Make collections simpler and faster.</p>
+        <h1>Don't you think you need an app for your work payments?</h1>
+        <p>If you are an emplyee working in an organization or a company and don't give any work for others, sorry..f**k off from here. This is purely for unorganized work provider or work seeker.</p>
         <a href="https://play.google.com/store/games?hl=en&pli=1">
             <img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" 
                 alt="Get it on Google Play" height="60" />
         </a>
         </div>
         <div className="hero-image">
-                <img className='image' src={logo}/>
+                <img className='image' src={workwallet} alt='workwallet'/>
         </div>
     </section>
     <section className="intro" id="vision">
         <div className="intro-content">
         <h2>Introducing Work Wallet</h2>
         <ul id='lists'>
-            <li>A Work Wallet is a digital platform designed to simplify and enhance workplace management by streamlining processes such as safety compliance, task tracking, and communication.</li>
-            <li>It allows organizations to centralize essential information like employee certifications, safety documents, and incident reports, making them easily accessible via mobile devices.</li>
-            <li>With features like real-time task updates, digital permits, and automated alerts for expiring credentials, a Work Wallet helps ensure regulatory compliance and boosts efficiency.</li>
-            <li>It also fosters better communication between teams, enabling swift sharing of updates and safety alerts.</li>
+            <h3>Your Digital Pocket for Effortless Work Payments</h3>
+            <h3>Create work contracts, add workers and settle the payments</h3>
+            <h3>For Worker: Organize your work, manage your income, and achieve financial stability with AI Assistance. </h3>
+            <h3>For Work Provider: Organize your work, manage your work expenditure</h3>
+            <h3>We are working on channelize the work payment for future India.</h3>
         </ul>
         </div>
         <div className="intro-image">
-        <img src="https://www.veltris.com/wp-content/uploads/2022/10/Who-we-are.png" alt="Team collaboration" />
+        <img src={work} alt="Team collaboration" />
         </div>
     </section>
 
@@ -72,19 +85,9 @@ return (
         <h2>Our Team</h2>
         <div className="team-grid">
             <div className="team-member">
-            <img src="https://okcredit.com/img/gaurav.jpg" alt="Team Member" />
-            <h3>John Doe</h3>
+            <img src={anil} alt="Team Member" />
+            <h3>Anilkumara Goud</h3>
             <p>CEO & Founder</p>
-            </div>
-            <div className="team-member">
-            <img src="https://okcredit.com/img/harsh.jpg" alt="Team Member" />
-            <h3>Jane Smith</h3>
-            <p>CTO</p>
-            </div>
-            <div className="team-member">
-            <img src="https://okcredit.com/img/aditya.jpg" alt="Team Member" />
-            <h3>Mike Johnson</h3>
-            <p>Head of Operations</p>
             </div>
         </div>
         </div>
@@ -98,9 +101,9 @@ return (
             <h3>Get in Touch</h3>
             <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
             <div className="contact-details">
-                <p>Email: contact@workwallet.com</p>
-                <p>Phone: (555) 123-4567</p>
-                <p>Address: 123 Business Street, Suite 100</p>
+                <p>Email: iamanilgoud@gmail.com</p>
+                <p>Phone: +91 7032586708</p>
+                <p>Address: Hyderabad, Telangana - (India)</p>
             </div>
             </div>
             <form className="contact-form">
@@ -113,20 +116,34 @@ return (
         </div>
     </section>
 
-    <section className="blogs" id="blog">
-        <div className="container">
-        <h2>Blogs</h2>
-        <div className="blog-grid">
-            {['About Unorganised force in India',  'For Capital Markets and Banking',].map((title, index) => (
-            <div key={index} className="blog-card">
-                <h3>{title}</h3>
-                <p>Understand risk and enhance accuracy across the entire trade life cycle.</p>
-                <a href="https://www.work-wallet.com/" className="read-more">Read More →</a>
-            </div>
-            ))}
-        </div>
-        </div>
-    </section>
+    <Routes>
+        <Route path="/" element={
+          <>
+            {/* Your existing sections */}
+            <section className="blogs" id="blog">
+              <div className="container">
+                <h2>Blogs</h2>
+                <div className="blog-grid">
+                  <div className="blog-card">
+                    <h3>About Unorganised work force in India</h3>
+                    <p>Great problem of India</p>
+                    <Link to="/blog" className="read-more">Read More →</Link>
+                  </div>
+                </div>
+                <div className="blog-grid">
+                  <div className="blog-card">
+                    <h3>Our plans for future</h3>
+                    
+                    <Link to="/plan" className="read-more">Read More →</Link>
+                  </div>
+                </div>
+              </div>
+            </section>
+            {/* Other sections... */}
+          </>
+        } />
+        <Route path="/blog" element={<Blog />} />
+      </Routes>
 
     <footer>
         <div className="footer-content">
@@ -146,9 +163,9 @@ return (
         <div className="footer-section">
             <h3>Contact</h3>
             <ul>
-            <li>Email: contact@workwallet.com</li>
-            <li>Phone: (555) 123-4567</li>
-            <li>Address: 123 Business St</li>
+            <li>Email: iamanilgoud@gmail.com</li>
+            <li>Phone: +91 7032586708</li>
+            <li>Address: Hyderabad, Telangana-India</li>
             </ul>
         </div>
         <div className="footer-section">
@@ -169,4 +186,17 @@ return (
 );
 };
 
-export default App;
+const App = () => {
+    return (
+      
+        <Routes>
+          <Route path="/" element={<MainContent />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/plan" element={<Plan />} />
+        </Routes>
+      
+    );
+  };
+  
+  export default App;
+
