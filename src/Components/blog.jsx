@@ -99,7 +99,7 @@ const Blog = () => {
               transformation would enable better workforce planning, more effective policymaking, and more equitable resource 
               allocation, benefiting both workers and the nation as a whole.
             </p>
-          
+          </header>
         </article>
       </main>
     </div>
@@ -109,4 +109,4 @@ const Blog = () => {
 export default Blog;
 
 
-       
+          
