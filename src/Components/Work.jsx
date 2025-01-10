@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faTwitter, faLinkedin, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import './App.css'; 
@@ -6,16 +6,26 @@ import logo from '../assests/Logo.png'
 import anil from '../assests/anil.png'
 import work from '../assests/workimage1.jpg'
 import workwallet from '../assests/workwallet.png'
+import worker from '../assests/worker.jpg'
+import workprovider from '../assests/workprovider.jpg'
 import Blog from '../Components/blog'
 import Plan from '../Components/plan'
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import {  Routes, Route, Link } from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 
 
 const MainContent = () => {
+  
+  const shouldScrollToTopRef = useRef(true);
+  const location = useLocation(); 
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    if (shouldScrollToTopRef.current) { 
+      window.scrollTo(0, 0); 
+      shouldScrollToTopRef.current = false; // Reset for subsequent renders
+    }
+  }, [location.pathname]);
 const [menuActive, setMenuActive] = useState(false);
 
 const toggleMenu = () => {
@@ -44,17 +54,14 @@ return (
         <a href="#team" onClick={(e) => handleSmoothScroll(e, 'team')}>Team</a>
         <a href="#blog" onClick={(e) => handleSmoothScroll(e, 'blog')}>Blogs</a>
         </div>
-        <div className="social-icons">
-        <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
-        <a href="#"><FontAwesomeIcon icon={faTwitter} /></a>
-        </div>
+        
         <div className="menu-toggle" onClick={toggleMenu}>☰</div>
     </nav>
 
     <section className="hero" id="about">
         <div className="hero-content">
         <h1>Don't you think you need an app for your work payments?</h1>
-        <p>If you are an emplyee working in an organization or a company and don't give any work for others, sorry..f**k off from here. This is purely for unorganized work provider or work seeker.</p>
+        <h3>If you are an emplyee working in an organization or a company and don't give any work for others, sorry..get off from here. This is purely for unorganized work provider or work seeker.</h3>
         <a href="https://play.google.com/store/games?hl=en&pli=1">
             <img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" 
                 alt="Get it on Google Play" height="60" />
@@ -66,17 +73,63 @@ return (
     </section>
     <section className="intro" id="vision">
         <div className="intro-content">
-        <h2>Introducing Work Wallet</h2>
+        <h2>Introducing Work_Wallet</h2>
         <ul id='lists'>
             <h3>Your Digital Pocket for Effortless Work Payments</h3>
             <h3>Create work contracts, add workers and settle the payments</h3>
-            <h3>For Worker: Organize your work, manage your income, and achieve financial stability with AI Assistance. </h3>
-            <h3>For Work Provider: Organize your work, manage your work expenditure</h3>
-            <h3>We are working on channelize the work payment for future India.</h3>
+            <h3>We are working on channelizing the work payment for future India.</h3>
         </ul>
         </div>
         <div className="intro-image">
-        <img src={work} alt="Team collaboration" />
+            <img 
+              src={work} 
+              alt="Team collaboration" 
+              style={{
+                width: '500px',
+                height: '400px',
+                objectFit: 'cover'
+              }}
+            />
+          </div>
+    </section>
+    <section className="intro" id="vision">
+        <div className="intro-content">
+        <h2>Why work provider should use Work_Wallet?</h2>
+        <ul id='lists'>
+            <h3>To digitize your work providing capability, manage your workers, Analytics on your work payments</h3>
+        </ul>
+        </div>
+        <div className="intro-image">
+          <img 
+            src={workprovider} 
+            alt="Team collaboration" 
+            style={{
+              width: '500px',
+              height: '400px',
+              objectFit: 'cover'
+            }}
+          />
+        </div>
+    </section>
+    <section className="intro" id="vision">
+        <div className="intro-content">
+        <h2>Why work seeker should use Work_Wallet?</h2>
+        <ul id='lists'>
+           
+            <h3>To digitize your work nature, manage your work contracts, Analytics on your work payments </h3>
+           
+        </ul>
+        </div>
+        <div className="intro-image">
+          <img 
+            src={worker} 
+            alt="Team collaboration" 
+            style={{
+              width: '500px',
+              height: '400px',
+              objectFit: 'cover'
+            }}
+          />
         </div>
     </section>
 
@@ -86,7 +139,7 @@ return (
         <div className="team-grid">
             <div className="team-member">
             <img src={anil} alt="Team Member" />
-            <h3>Anilkumara Goud</h3>
+            <h3>AnilkumarA Goud</h3>
             <p>CEO & Founder</p>
             </div>
         </div>
