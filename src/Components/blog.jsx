@@ -7,59 +7,32 @@ const Blog = () => {
   }, []);
 
   return (
-    <div
-      className="bg-gray-50"
-      style={{
-        width: '210mm',
-        minHeight: '297mm',
-        margin: '0 auto',
-        padding: '20mm',
-        boxShadow: '0 0 5px rgba(0,0,0,0.1)',
-        backgroundColor: '#fff',
-        textAlign: 'justify',
-      }}
-    >
+    <div className="bg-gray-50">
       {/* Navigation */}
       <nav className="bg-white border-b mb-6">
-        <div className="max-w-full px-6 py-4">
-          <Link to="/" className="text-gray-600 hover:text-gray-900">
+        <div className="max-w-full px-4 sm:px-6 py-4">
+          <Link to="/" className="text-gray-600 hover:text-gray-900" aria-label="Go back to the homepage">
             ← Back to Home
           </Link>
         </div>
       </nav>
 
-      {/* Content Container */}
-      <div className="max-w-full border border-gray-200 rounded-lg">
-        <article className="px-6 py-12">
-          {/* Header */}
+      {/* Main Content */}
+      <main
+        className="bg-white shadow-lg mx-auto p-4 sm:p-6 md:p-10 text-justify"
+        style={{ maxWidth: '100%', minHeight: '100vh' }}
+      >
+        <article>
           <header className="mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               The Unorganized Workforce in India
             </h1>
             <p className="text-gray-500 mb-8">Jan 1, 2025 • 10 min read</p>
-            <p className="text-xl text-gray-700 leading-relaxed p-6 border border-gray-300 rounded-lg bg-gray-100">
+            <p className="text-lg sm:text-xl text-gray-700 leading-relaxed bg-gray-100 p-4 rounded-lg">
               India, a rapidly developing nation, boasts a massive workforce, a significant portion of which belongs to the unorganized sector. 
               These workers contribute immensely to the economy yet remain vulnerable due to the lack of formal recognition, benefits, and protections. 
               This article explores the unorganized workforce in India, shedding light on their contribution, challenges, and potential solutions.
             </p>
-          </header>
-
-          {/* Main Content */}
-          <div className="prose prose-lg max-w-none">
-            <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-6">
-              Statistics of the Unorganized Workforce
-            </h2>
-            <p className="mb-6">
-              The scale of India's unorganized workforce is staggering. Approximately 450 million people are part of the workforce, 
-              with nearly 90% (around 405 million) employed in the unorganized sector. This sector contributes to around 50% of 
-              India's GDP, forming the backbone of crucial sectors like agriculture, construction, textiles, and domestic work.
-            </p>
-            <p className="mb-6">
-              The demographic makeup is diverse, with a large portion consisting of migrants, daily wage laborers, and contract workers. 
-              Women make up a significant percentage, especially in sectors like domestic work and handicrafts. This workforce's 
-              contribution is immense, yet they remain among the most vulnerable segments of society.
-            </p>
-
             <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-6">
               Sector-Wise Contribution
             </h2>
@@ -126,11 +99,14 @@ const Blog = () => {
               transformation would enable better workforce planning, more effective policymaking, and more equitable resource 
               allocation, benefiting both workers and the nation as a whole.
             </p>
-          </div>
+          
         </article>
-      </div>
+      </main>
     </div>
   );
 };
 
 export default Blog;
+
+
+       
