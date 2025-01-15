@@ -10,8 +10,10 @@ import worker from '../assests/worker.jpg'
 import workprovider from '../assests/workprovider.jpg'
 import Blog from '../Components/blog'
 import Plan from '../Components/plan'
+import Login from '../Components/login'
 import {  Routes, Route, Link } from 'react-router-dom';
 import {useLocation} from 'react-router-dom';
+import Home from '../Components/home';
 
 
 
@@ -53,6 +55,7 @@ return (
         <a href="#contact" onClick={(e) => handleSmoothScroll(e, 'contact')}>Contact us</a>
         <a href="#team" onClick={(e) => handleSmoothScroll(e, 'team')}>Team</a>
         <a href="#blog" onClick={(e) => handleSmoothScroll(e, 'blog')}>Blogs</a>
+        <Link to="/login" className="login-button">Login</Link>
         </div>
         
         <div className="menu-toggle" onClick={toggleMenu}>☰</div>
@@ -246,6 +249,8 @@ const App = () => {
           <Route path="/" element={<MainContent />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/plan" element={<Plan />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/home" element={<Home />} />
         </Routes>
       
     );
