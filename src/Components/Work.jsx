@@ -11,9 +11,17 @@ import workprovider from '../assests/workprovider.jpg'
 import Blog from '../Components/blog'
 import Plan from '../Components/plan'
 import Login from '../Components/login'
+import AI from '../Components/AI'
+import CreateContract from '../Components/createcontract'
 import {  Routes, Route, Link } from 'react-router-dom';
 import {useLocation} from 'react-router-dom';
 import Home from '../Components/home';
+import InvitationPage  from '../Components/contractinvitation';
+import ContractDetails from '../Components/contractdetails';
+import ContractList from '../Components/contractlist'
+import ContractCreatedList from '../Components/contractcreatedlist'
+import ContractReceivedList from '../Components/contractreceivedlist'
+
 
 
 
@@ -251,6 +259,13 @@ const App = () => {
           <Route path="/plan" element={<Plan />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/AI" element={<AI />} />
+          <Route path="/createcontract" element={<CreateContract />} />
+          <Route path="/contract-invitation" element={<InvitationPage/>}/>
+          <Route path="/contract-details" element={<ContractDetails/>}/>
+          <Route path="/Contract-list" element={<ContractList/>}/>
+          <Route path="/contractcreated-list" element={<ContractCreatedList/>}/>
+          <Route path="/contractreceiced-list" element={<ContractReceivedList/>}/>
         </Routes>
       
     );

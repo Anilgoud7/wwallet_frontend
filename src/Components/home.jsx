@@ -1,107 +1,239 @@
-import React, { useEffect, useState } from 'react';
-import '../App.css'; // Import global styles
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const [contractsList, setContractsList] = useState([]);
-  const [contractsByWorkProvider, setContractsByWorkProvider] = useState([]);
-  const [contractsReceivedByWorker, setContractsReceivedByWorker] = useState([]);
-  const [contractInvitationsReceived, setContractInvitationsReceived] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [userProfile, setUserProfile] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [tempName, setTempName] = useState('');
+  const [tempPhone, setTempPhone] = useState('');
+  const [tempAge, setTempAge] = useState('');
+  const [tempGender, setTempGender] = useState('');
 
-  // Define API endpoints
-  const API_BASE_URL = 'http://127.0.0.1:8000/api';  // Change this to your actual API base URL
-  const endpoints = {
-    contractsList: `${API_BASE_URL}/aicontractslist/`,
-    contractsByWorkProvider: `${API_BASE_URL}/aicontractworkprovider/`,
-    contractsReceivedByWorker: `${API_BASE_URL}/aicontractmember`,
-    contractInvitationsReceived: `${API_BASE_URL}/ainvitationresponse/`,
+  const navigate = useNavigate();
+  const BASE_URL = 'http://127.0.0.1:8000'; // Add this base URL constant
+
+  const getTokenFromsessionStorage = () => {
+    const token = sessionStorage.getItem('AccessToken'); 
+    return token;
   };
+  
+  // Example usage:
+  const bearerToken = getTokenFromsessionStorage(); 
 
-  // Fetch data from all endpoints
-  const fetchContractsData = async () => {
-    setLoading(true);
-    setError('');
+  // Fetch user profile and stats from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const profileResponse = await fetch(`${BASE_URL}/api/profile/`, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+        const statsResponse = await fetch(`${BASE_URL}/api/contracts/summary/`, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+
+        if (!profileResponse.ok) {
+          throw new Error(`Profile fetch failed: ${profileResponse.status}`);
+        }
+        if (!statsResponse.ok) {
+          throw new Error(`Stats fetch failed: ${statsResponse.status}`);
+        }
+
+        const profileData = await profileResponse.json();
+        const statsData = await statsResponse.json();
+
+        setUserProfile(profileData);
+        setStats(statsData);
+
+        // Set temporary fields for editing
+        setTempName(profileData.name);
+        setTempPhone(profileData.phone);
+        setTempAge(profileData.age);
+        setTempGender(profileData.gender);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+  // Handle profile update
+  const handleSaveProfile = async () => {
     try {
-      const [
-        contractsListResponse,
-        contractsByWorkProviderResponse,
-        contractsReceivedByWorkerResponse,
-        contractInvitationsReceivedResponse
-      ] = await Promise.all([
-        fetch(endpoints.contractsList),
-        fetch(endpoints.contractsByWorkProvider),
-        fetch(endpoints.contractsReceivedByWorker),
-        fetch(endpoints.contractInvitationsReceived)
-      ]);
+      const updatedProfile = {
+        name: tempName,
+        phone: tempPhone,
+        age: tempAge,
+        gender: tempGender,
+      };
 
-      // Parse the responses
-      const contractsListData = await contractsListResponse.json();
-      const contractsByWorkProviderData = await contractsByWorkProviderResponse.json();
-      const contractsReceivedByWorkerData = await contractsReceivedByWorkerResponse.json();
-      const contractInvitationsReceivedData = await contractInvitationsReceivedResponse.json();
+      const response = await fetch(`${BASE_URL}/api/profile/`, {
+        method: 'post',
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProfile),
+      });
 
-      // Update the state with the fetched data
-      setContractsList(contractsListData);
-      setContractsByWorkProvider(contractsByWorkProviderData);
-      setContractsReceivedByWorker(contractsReceivedByWorkerData);
-      setContractInvitationsReceived(contractInvitationsReceivedData);
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
 
-    } catch (err) {
-      setError('Failed to fetch data. Please try again.');
-    } finally {
-      setLoading(false);
+      setUserProfile(updatedProfile);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      setError('Failed to update profile. Please try again.');
     }
   };
 
-  // Fetch data when the component mounts
-  useEffect(() => {
-    fetchContractsData();
-  }, []);
+  // Navigation handlers
+  const handleAIButtonClick = () => navigate('/AI');
+  const handleCreateContractClick = () => navigate('/createcontract');
+  const handleContractListClick = () => navigate('/contract-list');
+  const handleContractCreateListClick = () => navigate('/contractcreated-list');
+  const handleInvitationListClick = () => navigate('/contract-invitation');
+  const handleContractReceivedListClick = () => navigate('/contractreceived-list');
+
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <p>Loading your profile and stats...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p>Error: {error}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    );
+  }
+
+  if (!userProfile || !stats) {
+    return (
+      <div className="error-container">
+        <p>No data available. Please try again later.</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    );
+  }
 
   return (
     <div className="home-container">
-      <h1 className="home-title">Contracts Dashboard</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p className="error-message">{error}</p>
-      ) : (
-        <div className="contracts-list">
-          <div className="contract-category">
-            <h2>All Contracts</h2>
-            <ul>
-              {contractsList.map((contract) => (
-                <li key={contract.id}>{contract.name} - {contract.status}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="contract-category">
-            <h2>Contracts by Work Provider</h2>
-            <ul>
-              {contractsByWorkProvider.map((contract) => (
-                <li key={contract.id}>{contract.name} - {contract.status}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="contract-category">
-            <h2>Contracts Received by Worker</h2>
-            <ul>
-              {contractsReceivedByWorker.map((contract) => (
-                <li key={contract.id}>{contract.name} - {contract.status}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="contract-category">
-            <h2>Contract Invitations Received</h2>
-            <ul>
-              {contractInvitationsReceived.map((invitation) => (
-                <li key={invitation.id}>{invitation.contractName} - {invitation.status}</li>
-              ))}
-            </ul>
-          </div>
+      {/* Profile Section */}
+      <div className="profile-section">
+        <div className="profile-info">
+          <h2>
+            {isEditing ? (
+              <input
+                type="text"
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                className="edit-input"
+              />
+            ) : (
+              userProfile.name
+            )}
+          </h2>
+          <p>
+            {isEditing ? (
+              <input
+                type="tel"
+                value={tempPhone}
+                onChange={(e) => setTempPhone(e.target.value)}
+                className="edit-input"
+              />
+            ) : (
+              userProfile.phone
+            )}
+          </p>
+          <p>
+            {isEditing ? (
+              <input
+                type="number"
+                value={tempAge}
+                onChange={(e) => setTempAge(e.target.value)}
+                className="edit-input"
+              />
+            ) : (
+              userProfile.age
+            )}
+          </p>
+          <p>
+            {isEditing ? (
+              <select
+                value={tempGender}
+                onChange={(e) => setTempGender(e.target.value)}
+                className="edit-input"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            ) : (
+              userProfile.gender
+            )}
+          </p>
+          <button 
+            className="edit-button" 
+            onClick={isEditing ? handleSaveProfile : () => setIsEditing(true)}
+          >
+            {isEditing ? 'Save' : 'Edit Profile'}
+          </button>
         </div>
-      )}
+      </div>
+
+      {/* Stats Grid */}
+      <div className="action-grid">
+        <div className="action-card" onClick={handleContractListClick}>
+          <h3>Total Contracts</h3>
+          <p className="stat-number">{stats.total_contracts}</p>
+        </div>
+        <div className="action-card" onClick={handleContractCreateListClick}>
+          <h3>Contracts Created</h3>
+          <p className="stat-number">{stats.contracts_as_provider}</p>
+        </div>
+        <div className="action-card" onClick={handleContractReceivedListClick}>
+          <h3>Contracts Received</h3>
+          <p className="stat-number">{stats.contracts_as_member}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Total Days Worked</h3>
+          <p className="stat-number">{stats.total_days_worked}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Total Amount Earned</h3>
+          <p className="stat-number">₹{stats.total_amount_earned}</p>
+        </div>
+        <div className="action-card" onClick={handleInvitationListClick}>
+          <h3>Invitations</h3>
+          <p className="stat-number">{stats.pending_invitations}</p>
+        </div>
+        <div className="action-card" onClick={handleAIButtonClick}>
+          <h3>Start AI Chat</h3>
+          <p>Interact with our AI assistant to help you with tasks.</p>
+        </div>
+        <div className="action-card" onClick={handleCreateContractClick}>
+          <h3>Create Contract</h3>
+          <p>Start creating a new contract for your needs.</p>
+        </div>
+      </div>
     </div>
   );
 };
