@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ContractListPage = () => {
   const [contracts, setContracts] = useState([]);
@@ -6,13 +7,15 @@ const ContractListPage = () => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
 
-  const apiUrl = 'http://127.0.0.1:8000/api/contracts/'; // Replace with your actual backend URL
+  const navigate = useNavigate(); // React Router navigation hook
+
+  const apiUrl = 'http://127.0.0.1:8000/api/aicontractlist/';
 
   useEffect(() => {
     const fetchContracts = async () => {
       try {
-        setError(''); // Clear previous error
-        const token = sessionStorage.getItem('Access'); // Retrieve session token
+        setError('');
+        const token = sessionStorage.getItem('AccessToken');
 
         if (!token) {
           throw new Error('Session token not found. Please log in.');
@@ -31,8 +34,8 @@ const ContractListPage = () => {
         }
 
         const data = await response.json();
-        setContracts(data.contracts || []); // Assuming the response has a `contracts` array
-        setFilteredContracts(data.contracts || []);
+        setContracts(data); // Updated to use data directly since it's an array
+        setFilteredContracts(data);
       } catch (error) {
         setError(error.message);
       }
@@ -45,23 +48,33 @@ const ContractListPage = () => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
     const filtered = contracts.filter((contract) =>
-      contract.name.toLowerCase().includes(value)
+      contract.id.toString().includes(value) ||
+      contract.work_provider.toLowerCase().includes(value) ||
+      contract.amount.toString().includes(value)
     );
     setFilteredContracts(filtered);
+  };
+
+  // Format date string to local date format
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleRowClick = (contractId) => {
+    
+    navigate(`/contractdetail/${contractId}`); // Navigate to the detailed page for the contract
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>Contract List</h1>
 
-      {/* Error Message */}
       {error && (
         <div style={{ color: 'red', marginBottom: '20px' }}>
           <strong>Error:</strong> {error}
         </div>
       )}
 
-      {/* Search Bar */}
       <input
         type="text"
         placeholder="Search contracts..."
@@ -75,52 +88,42 @@ const ContractListPage = () => {
         }}
       />
 
-      {/* Contract List */}
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          textAlign: 'left',
-        }}
-      >
+      <table style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        textAlign: 'left',
+      }}>
         <thead>
           <tr>
-            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>
-              ID
-            </th>
-            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>
-              Name
-            </th>
-            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>
-              Status
-            </th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>ID</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Amount</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Start Date</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>End Date</th>
+
           </tr>
         </thead>
         <tbody>
           {filteredContracts.length > 0 ? (
             filteredContracts.map((contract) => (
-              <tr key={contract.id}>
-                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                  {contract.id}
-                </td>
-                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                  {contract.name}
-                </td>
-                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                  {contract.status}
-                </td>
+              <tr
+                key={contract.id}
+                onClick={() => handleRowClick(contract.id)}
+                style={{ cursor: 'pointer', backgroundColor: '#f9f9f9' }}
+              >
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{contract.id}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>₹{contract.amount}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{formatDate(contract.start_date)}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{formatDate(contract.end_date)}</td>
+
               </tr>
             ))
           ) : (
             <tr>
-              <td
-                colSpan="3"
-                style={{
-                  textAlign: 'center',
-                  padding: '20px',
-                  borderBottom: '1px solid #ddd',
-                }}
-              >
+              <td colSpan="7" style={{
+                textAlign: 'center',
+                padding: '20px',
+                borderBottom: '1px solid #ddd',
+              }}>
                 No contracts found.
               </td>
             </tr>

@@ -1,44 +1,83 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const ContractsCreatedListPage = () => {
-  // State to hold contract data
-  const [createdContracts, setCreatedContracts] = useState([]);
+const ContractListPage = () => {
+  const [contracts, setContracts] = useState([]);
   const [filteredContracts, setFilteredContracts] = useState([]);
   const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
 
-  // Simulate fetching data (Replace with API call)
+  const navigate = useNavigate(); // React Router navigation hook
+
+  const apiUrl = 'http://127.0.0.1:8000/api/aicontractworkprovider/';
+
   useEffect(() => {
     const fetchContracts = async () => {
-      const mockCreatedContracts = [
-        { id: 1, name: 'Created Contract A', date: '2025-01-10', status: 'Active' },
-        { id: 2, name: 'Created Contract B', date: '2025-01-12', status: 'Pending' },
-        { id: 3, name: 'Created Contract C', date: '2025-01-15', status: 'Completed' },
-      ];
-      setCreatedContracts(mockCreatedContracts);
-      setFilteredContracts(mockCreatedContracts);
+      try {
+        setError('');
+        const token = sessionStorage.getItem('AccessToken');
+
+        if (!token) {
+          throw new Error('Session token not found. Please log in.');
+        }
+
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch contracts. Please try again.');
+        }
+
+        const data = await response.json();
+        setContracts(data); // Updated to use data directly since it's an array
+        setFilteredContracts(data);
+      } catch (error) {
+        setError(error.message);
+      }
     };
 
     fetchContracts();
-  }, []);
+  }, [apiUrl]);
 
-  // Handle Search
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
-    const filtered = createdContracts.filter((contract) =>
-      contract.name.toLowerCase().includes(value)
+    const filtered = contracts.filter((contract) =>
+      contract.id.toString().includes(value) ||
+      contract.work_provider.toLowerCase().includes(value) ||
+      contract.amount.toString().includes(value)
     );
     setFilteredContracts(filtered);
   };
 
+  // Format date string to local date format
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleRowClick = (contractId) => {
+    
+    navigate(`/contractdetail/${contractId}`); // Navigate to the detailed page for the contract
+  };
+
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Contracts Created List</h1>
+      <h1>Contract List</h1>
 
-      {/* Search Bar */}
+      {error && (
+        <div style={{ color: 'red', marginBottom: '20px' }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
       <input
         type="text"
-        placeholder="Search created contracts..."
+        placeholder="Search contracts..."
         value={search}
         onChange={handleSearch}
         style={{
@@ -49,43 +88,44 @@ const ContractsCreatedListPage = () => {
         }}
       />
 
-      {/* Created Contracts List */}
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          textAlign: 'left',
-        }}
-      >
+      <table style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        textAlign: 'left',
+      }}>
         <thead>
           <tr>
             <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>ID</th>
-            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Name</th>
-            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Date Created</th>
-            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Status</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Description</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Amount</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Start Date</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>End Date</th>
+            
           </tr>
         </thead>
         <tbody>
           {filteredContracts.length > 0 ? (
             filteredContracts.map((contract) => (
-              <tr key={contract.id}>
+              <tr
+                key={contract.id}
+                onClick={() => handleRowClick(contract.id)}
+                style={{ cursor: 'pointer', backgroundColor: '#f9f9f9' }}
+              >
                 <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{contract.id}</td>
-                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{contract.name}</td>
-                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{contract.date}</td>
-                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{contract.status}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{contract.discription}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>₹{contract.amount}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{formatDate(contract.start_date)}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{formatDate(contract.end_date)}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td
-                colSpan="4"
-                style={{
-                  textAlign: 'center',
-                  padding: '20px',
-                  borderBottom: '1px solid #ddd',
-                }}
-              >
-                No created contracts found.
+              <td colSpan="7" style={{
+                textAlign: 'center',
+                padding: '20px',
+                borderBottom: '1px solid #ddd',
+              }}>
+                No contracts found.
               </td>
             </tr>
           )}
@@ -95,4 +135,4 @@ const ContractsCreatedListPage = () => {
   );
 };
 
-export default ContractsCreatedListPage;
+export default ContractListPage;

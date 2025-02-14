@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateContract = () => {
   const [amount, setAmount] = useState('');
+  const [discription, setDiscription] = useState('')
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [error, setError] = useState('');
@@ -68,6 +69,7 @@ const CreateContract = () => {
         amount: parseFloat(amount),
         startDate,
         endDate,
+        discription,
       }),
     });
 
@@ -75,7 +77,7 @@ const CreateContract = () => {
       throw new Error('Failed to create contract');
     }
 
-    navigate('/contractinvitation');
+    navigate('/home');
   } catch (err) {
     console.error('Error:', err);
     setError('Failed to create contract. Please try again.');
@@ -97,7 +99,7 @@ const CreateContract = () => {
           {/* Amount Input */}
           <div>
             <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-              Amount (₹)
+              Amount/person (₹)
             </label>
             <input
               type="number"
@@ -143,6 +145,20 @@ const CreateContract = () => {
               {error}
             </div>
           )}
+          {/* Discription */}
+          <div>
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+              Discription
+            </label>
+            <input
+              type="text"
+              id="discription"
+              value={discription}
+              onChange={(e) => setDiscription(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Anything you want to say"
+            />
+          </div>
 
           {/* Submit Button */}
           <button

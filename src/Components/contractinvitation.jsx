@@ -1,147 +1,226 @@
-// App.js
-import React, { useState } from "react";
-import "./App.css";
+import React, { useState, useEffect } from 'react';
 
-function App() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [error, setError] = useState("");
+const ContractInvitationList = () => {
+  const [invitations, setInvitations] = useState([]);
+  const [filteredInvitations, setFilteredInvitations] = useState([]);
+  const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
 
-  // Example contract details
-  const contractDetails = {
-    id: "12345",
-    name: "Project Alpha",
-    description: "This contract is for the development of Project Alpha.",
-    startDate: "2025-01-01",
-    endDate: "2025-12-31",
+  const apiUrl = 'http://127.0.0.1:8000/api/send_invitation/';
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        setError('');
+        const token = sessionStorage.getItem('AccessToken');
+
+        if (!token) {
+          throw new Error('Session token not found. Please log in.');
+        }
+
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch invitations. Please try again.');
+        }
+
+        const data = await response.json();
+        setInvitations(data);
+        console.log('data',data);
+        setFilteredInvitations(data);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchInvitations();
+  }, [apiUrl]);
+
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearch(value);
+    const filtered = invitations.filter((invitation) =>
+      invitation.id.toString().includes(value) ||
+      invitation.contract.toString().includes(value) ||
+      invitation.status.toLowerCase().includes(value)
+    );
+    setFilteredInvitations(filtered);
   };
 
-  // API endpoints
-  const searchApiUrl = "https://backend.example.com/api/search-users"; // Replace with your actual user search API
-  const inviteApiUrl = "https://backend.example.com/api/send-invite"; // Replace with your actual invite API
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  };
 
-  const handleSearch = async () => {
-    try {
-      setError(""); // Clear previous error
-      const response = await fetch(`${searchApiUrl}?query=${searchQuery}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  const formatMembers = (members) => {
+    return members.join(', ');
+  };
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch search results.");
-      }
+  const getStatusStyle = (status) => {
+    const baseStyle = {
+      padding: '4px 8px',
+      borderRadius: '4px',
+      fontWeight: 'bold',
+    };
 
-      const data = await response.json();
-      setSearchResults(data.users || []); // Assuming the response has a `users` array
-    } catch (error) {
-      setError("Error fetching search results. Please try again.");
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return {
+          ...baseStyle,
+          backgroundColor: '#e6ffe6',
+          color: '#006600',
+        };
+      case 'pending':
+        return {
+          ...baseStyle,
+          backgroundColor: '#fff3e6',
+          color: '#cc7700',
+        };
+      default:
+        return baseStyle;
     }
   };
 
-  const handleAddMember = (user) => {
-    if (!members.find((member) => member.id === user.id)) {
-      setMembers([...members, user]);
-    }
-  };
-
-  const handleSendInvite = async () => {
+  const handleResponse = async (id, response) => {
     try {
-      setError(""); // Clear previous error
+      const token = sessionStorage.getItem('AccessToken');
+      const responseApiUrl = `http://127.0.0.1:8000/api/invitationresponse/`;
 
-      const response = await fetch(inviteApiUrl, {
-        method: "POST",
+      const res = await fetch(responseApiUrl, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          contractId: contractDetails.id,
-          members: members.map((member) => member.id), // Send member IDs
-        }),
+        body: JSON.stringify({ 
+          id:id,
+          action:response }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to send invites.");
+      if (!res.ok) {
+        throw new Error('Failed to update invitation status. Please try again.');
       }
 
-      alert("Invites sent successfully!");
-      setMembers([]); // Clear members after successful invite
+      // Update invitation list after response
+      const updatedInvitations = invitations.map((invitation) =>
+        invitation.id === id ? { ...invitation, status: response } : invitation
+      );
+
+      setInvitations(updatedInvitations);
+      setFilteredInvitations(updatedInvitations);
     } catch (error) {
-      setError("Error sending invites. Please try again.");
+      setError(error.message);
     }
   };
 
   return (
-    <div className="invite-page">
-      {/* Contract Details Section */}
-      <div className="contract-details">
-        <h2>Contract Details</h2>
-        <p><strong>ID:</strong> {contractDetails.id}</p>
-        <p><strong>Name:</strong> {contractDetails.name}</p>
-        <p><strong>Description:</strong> {contractDetails.description}</p>
-        <p><strong>Start Date:</strong> {contractDetails.startDate}</p>
-        <p><strong>End Date:</strong> {contractDetails.endDate}</p>
-      </div>
+    <div style={{ padding: '20px' }}>
+      <h1>Contract Invitations</h1>
 
-      {/* Search Section */}
-      <div className="grid-container">
-        <div className="search-section">
-          <input
-            type="text"
-            placeholder="Search for users"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button onClick={handleSearch}>Search</button>
+      {error && (
+        <div style={{ color: 'red', marginBottom: '20px' }}>
+          <strong>Error:</strong> {error}
         </div>
+      )}
 
-        {/* Error Message */}
-        {error && <div className="error-message">{error}</div>}
+      <input
+        type="text"
+        placeholder="Search invitations..."
+        value={search}
+        onChange={handleSearch}
+        style={{
+          marginBottom: '20px',
+          padding: '10px',
+          width: '100%',
+          fontSize: '16px',
+        }}
+      />
 
-        {/* Search Results Grid */}
-        <div className="results-grid">
-          <h2>Search Results</h2>
-          <ul>
-            {searchResults.map((user) => (
-              <li key={user.id}>
-                {user.name}
-                <button onClick={() => handleAddMember(user)}>Add</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Members Grid */}
-        <div className="members-grid">
-          <h2>Members</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          textAlign: 'left',
+        }}
+      >
+        <thead>
+          <tr>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>ID</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Contract ID</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Work Provider</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Members</th>
+            <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredInvitations.length > 0 ? (
+            filteredInvitations.map((invitation) => (
+              <tr key={invitation.id}>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{invitation.id}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{invitation.contract}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{invitation.work_provider}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{formatMembers(invitation.members)}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                  {invitation.status.toLowerCase() === 'pending' ? (
+                    <div>
+                      <button
+                        onClick={() => handleResponse(invitation.id, 'accept')}
+                        style={{
+                          marginRight: '10px',
+                          padding: '5px 10px',
+                          backgroundColor: '#4CAF50',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleResponse(invitation.id, 'reject')}
+                        style={{
+                          padding: '5px 10px',
+                          backgroundColor: '#f44336',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <span style={getStatusStyle(invitation.status)}>{invitation.status}</span>
+                  )}
+                
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {members.map((member) => (
-                <tr key={member.id}>
-                  <td>{member.name}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Invite Button */}
-        <div className="invite-button">
-          <button onClick={handleSendInvite} disabled={members.length === 0}>
-            Send Invite
-          </button>
-        </div>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan="7"
+                style={{
+                  textAlign: 'center',
+                  padding: '20px',
+                  borderBottom: '1px solid #ddd',
+                }}
+              >
+                No invitations found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
 
-export default App;
+export default ContractInvitationList;

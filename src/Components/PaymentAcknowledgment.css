@@ -1,0 +1,185 @@
+/* Base Container */
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Heading */
+h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+/* Form Container */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Error Message */
+.error-message {
+  color: red;
+  background: #ffe5e5;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Status Message */
+.status-message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.paid {
+  background: #d4edda;
+  color: #155724;
+}
+
+.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 480px) {
+  * {
+      box-sizing: border-box;
+  }
+
+  body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow-x: hidden;
+      font-size: 12px;  /* Base font size for mobile */
+  }
+
+  .container {
+      max-width: 100%;
+      margin: 10px;
+      padding: 10px;
+      box-shadow: none;
+      border: none;
+      overflow-x: hidden;
+  }
+
+  h2 {
+      font-size: 14px;  /* Significantly reduced */
+      margin-bottom: 10px;
+  }
+
+  .form-group {
+      margin-bottom: 8px;
+  }
+
+  label {
+      font-size: 10px;  /* Significantly reduced */
+      margin-bottom: 2px;
+  }
+
+  select {
+      padding: 6px;
+      font-size: 11px;  /* Significantly reduced */
+      height: 30px;  /* Ensure good tap target while keeping compact */
+  }
+
+  button {
+      padding: 8px;
+      font-size: 12px;  /* Significantly reduced */
+      height: 32px;
+      margin-top: 6px;
+  }
+
+  .error-message,
+  .status-message {
+      font-size: 10px;  /* Significantly reduced */
+      padding: 6px;
+      margin-bottom: 6px;
+  }
+}
+
+/* Small Mobile Devices */
+@media screen and (max-width: 320px) {
+  .container {
+      margin: 5px;
+      padding: 6px;
+  }
+
+  h2 {
+      font-size: 13px;  /* Even smaller */
+  }
+
+  label {
+      font-size: 9px;  /* Even smaller */
+  }
+
+  select {
+      font-size: 10px;  /* Even smaller */
+      height: 28px;
+  }
+
+  button {
+      font-size: 11px;  /* Even smaller */
+      height: 30px;
+  }
+
+  .error-message,
+  .status-message {
+      font-size: 9px;  /* Even smaller */
+      padding: 5px;
+  }
+}
+
+/* Ensure no horizontal scrolling */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}

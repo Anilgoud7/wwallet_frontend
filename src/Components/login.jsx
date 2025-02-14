@@ -85,10 +85,10 @@ const MobileOTPLogin = () => {
 
       if (data.refresh) {
         try {
-          localStorage.setItem('RefreshToken', data.refresh);
-          localStorage.setItem('AccessToken', data.access);
+          sessionStorage.setItem('RefreshToken', data.refresh);
+          sessionStorage.setItem('AccessToken', data.access);
 
-          console.log('Tokens saved to localStorage');
+          console.log('Tokens saved to localStorage', data.access);
         } catch (storageError) {
           console.error('Error saving tokens to localStorage:', storageError);
           setError('Failed to save tokens. Please try again.');
@@ -97,8 +97,12 @@ const MobileOTPLogin = () => {
       } else {
         console.warn('Token not found in response');
       }
-
-      navigate('/home'); // Redirect to home after successful OTP verification
+      if (data.newUser) {
+        console.log('New user detected. Redirecting to update profile...');
+        navigate('/updateprofile', { state: { phoneNumber } });
+      } else {
+        navigate('/home'); // Redirect to home if existing user
+      }
     } catch (error) {
       console.error('Error verifying OTP:', error);
       setError('Failed to verify OTP. Please try again.');

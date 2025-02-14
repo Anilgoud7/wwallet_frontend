@@ -1,45 +1,40 @@
 import React, { useState } from 'react';
-import './AIChatPage.css'; // Add styles for the chat
+import './AIChatPage.css';
 
 const AIChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Predefined AI responses
-  const predefinedResponses = {
-    "hello": "Hello! How can I assist you today?",
-    "how are you": "I'm just a bot, but I'm doing great! How about you?",
-    "bye": "Goodbye! Have a great day!",
-  };
+  const [feeding, setFeeding] = useState(false);
+  const getTokenFromSessionStorage = () => sessionStorage.getItem('AccessToken');
+  const bearerToken = getTokenFromSessionStorage();
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
-  
-    // Add the user's message to the chat
+
+
     setMessages([...messages, { sender: 'user', text: inputMessage }]);
     setInputMessage('');
     setLoading(true);
-  
+
     try {
-      // Call the backend AI API
       const response = await fetch('http://127.0.0.1:8000/api/ai/', {
         method: 'POST',
         headers: {
+          Authorization: `Bearer ${bearerToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           message: inputMessage,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to get response from AI backend');
       }
-  
+
       const data = await response.json();
-  
-      // Add the AI's response to the chat
+
       setMessages((prevMessages) => [
         ...prevMessages,
         { sender: 'ai', text: data.response || 'Sorry, no response received.' },
@@ -54,11 +49,22 @@ const AIChatPage = () => {
       setLoading(false);
     }
   };
-  
+
+
 
   return (
     <div className="chat-container">
-      <h1 className="chat-title">AI Chat</h1>
+      <h1 className="chat-title">Work wallet AI </h1>
+      
+      <div className="button-container">
+        <button 
+          className="feed-button" 
+         
+          disabled={feeding}
+        >
+          {feeding ? 'Feeding Data...' : 'AI provides information regarding your work and earnings'}
+        </button>
+      </div>
 
       <div className="chat-box">
         {messages.map((message, index) => (
@@ -66,7 +72,7 @@ const AIChatPage = () => {
             <p>{message.text}</p>
           </div>
         ))}
-        
+
         {loading && (
           <div className="chat-message ai">
             <p>...</p>
@@ -82,7 +88,9 @@ const AIChatPage = () => {
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Type a message..."
         />
-        <button className="send-button" onClick={handleSendMessage}>Send</button>
+        <button className="send-button" onClick={handleSendMessage}>
+          Send
+        </button>
       </div>
     </div>
   );

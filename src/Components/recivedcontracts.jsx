@@ -9,7 +9,7 @@ const ContractListPage = () => {
 
   const navigate = useNavigate(); // React Router navigation hook
 
-  const apiUrl = 'http://127.0.0.1:8000/api/aicontractlist/';
+  const apiUrl = 'http://127.0.0.1:8000/api/aicontractmember/';
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -100,6 +100,7 @@ const ContractListPage = () => {
             <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Amount</th>
             <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>Start Date</th>
             <th style={{ borderBottom: '2px solid #ddd', padding: '10px' }}>End Date</th>
+           
           </tr>
         </thead>
         <tbody>
