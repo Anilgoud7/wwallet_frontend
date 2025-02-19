@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
 
 const UserInvitationPage = () => {
   const [searchResult, setSearchResult] = useState(null);
@@ -13,6 +14,11 @@ const UserInvitationPage = () => {
 
   const apiUrl = 'http://127.0.0.1:8000/api/search/'; // Replace with your API URL
 
+  useEffect(() => {
+    console.log("Updated Search Result:", searchResult);
+  }, [searchResult]); // Now logs the updated state whenever searchResult changes
+  
+  
   // Handle search by phone number
   const handleSearch = async (query) => {
     try {
@@ -34,68 +40,100 @@ const UserInvitationPage = () => {
       }
 
       const data = await response.json();
-      
-        // Update search result to include the user's phone
-        setSearchResult(data); // Assume the first user in the list
+
+            if (data) {
+                const userData = {  // Create a new object with only the data you need
+                    phoneNumber: data.phoneNumber,
+                    name: data.name, // Include other fields if needed
+                    // ... other fields as required
+                };
+        setSearchResult(userData);// Assume the first user in the list
+        console.log("Search result:", searchResult);
         
-    } catch (err) {
+    } 
+    else{
+      setSearchResult(null);
+    }
+     }   catch (err) {
       setError(err.message);
       setSearchResult(null);
     }
   };
-
-  // Handle adding a user to the invitation list
+ 
   const handleAddToInvitationList = () => {
     if (!searchResult) {
-      setError('Please search for a user first.');
-      return;
+        setError('Please search for a user first.');
+        return;
     }
 
-    // Check for duplicates using the `phone` field
-    if (invitationList.some((user) => user.phone === searchResult.phone)) {
-      setError('User is already in the invitation list.');
-      return;
+    if (!searchResult.phoneNumber) {
+        setError('Invalid user data. Missing phone number.');
+        console.error('Invalid user data:', searchResult);
+        return;
     }
 
-    // Add the searched user to the invitation list
-    setInvitationList([...invitationList, searchResult]);
-    setSearchResult(null); // Clear search result after adding
-  };
+    setInvitationList((prevList) => {
+        if (prevList.some((user) => user.phoneNumber === searchResult.phoneNumber)) {
+            setError('User is already in the invitation list.');
+            return prevList; 
+        }
 
+        const newInvitation = { 
+            phoneNumber: searchResult.phoneNumber,
+        };
+        console.log("Adding to invitation list:", newInvitation);
+
+        return [...prevList, newInvitation]; // Correctly updates the state
+    });
+};
+
+// ✅ Use useEffect to confirm the state update:
+useEffect(() => {
+    console.log("Updated invitationList:", invitationList);
+}, [invitationList]); // Logs new values when invitationList updates
+
+
+  
   // Handle submitting the invitations
   const handleSubmitInvitations = async () => {
     try {
-      setError('');
-      const token = sessionStorage.getItem('AccessToken');
-      if (!invitationList.length) {
-        setError('No users in the invitation list to send.');
-        return;
-      }
-      const requestBody = {
-        id: contractId,
-        members: invitationList.map((user) => user.phone),
-      };
-      console.log("Sending Request Body:", requestBody);
+        setError('');
 
-      const response = await fetch('http://127.0.0.1:8000/api/send_invitation/', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+        if (invitationList.length === 0) { // Ensure the updated list is read correctly
+            console.error("No users in invitation list at submit:", invitationList);
+            setError('No users in the invitation list to send.');
+            return;
+        }
 
-      if (!response.ok) {
-        throw new Error('Failed to send invitations. Please try again.');
-      }
+        
 
-      alert('Invitations sent successfully!');
-      setInvitationList([]); // Clear the invitation list after submission
+        
+        const response = await fetch('http://127.0.0.1:8000/api/send_invitation/', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('AccessToken')}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: contractId,
+              members: invitationList.map((user) => user.phoneNumber),
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send invitations. Please try again.');
+        }
+
+        alert('Invitations sent successfully!');
+        setInvitationList([]); // Clear after sending
     } catch (err) {
-      setError(err.message);
+        setError(err.message);
     }
-  };
+};
+
+
+
+  
 
   return (
     <div style={{ padding: '20px' }}>
@@ -131,7 +169,8 @@ const UserInvitationPage = () => {
         <div style={{ marginBottom: '20px' }}>
           <h3>Search Result</h3>
           <div style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
-            <p><strong>Phone:</strong> {searchResult.phone}</p>
+            <p><strong>Phone:</strong> {searchResult.phoneNumber}</p>
+            <p><strong>Name:</strong> {searchResult.name}</p>
             <button
               onClick={handleAddToInvitationList}
               style={{
@@ -168,7 +207,7 @@ const UserInvitationPage = () => {
                 }}
               >
                 <div>
-                  <span style={{ fontWeight: '500', marginRight: '10px' }}>{user.phone}</span>
+                  <span style={{ fontWeight: '500', marginRight: '10px' }}>{user.phoneNumber}</span>
                 </div>
                 <button
                   onClick={() => {

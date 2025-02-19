@@ -5,9 +5,6 @@ import './App.css';
 import logo from '../assests/Logo.png';
 import anil from '../assests/anil.png';
 import work from '../assests/workimage1.jpg';
-import workwallet from '../assests/workwallet.png';
-import worker from '../assests/worker.jpg';
-import workprovider from '../assests/workprovider.jpg';
 import Blog from '../Components/blog';
 import Plan from '../Components/plan';
 import Login from '../Components/login';
@@ -76,10 +73,11 @@ const MainContent = () => {
       <section className="hero" id="about">
         <div className="hero-content">
           <h1>Simplify Your Work Payments with Work_Wallet</h1>
-          <h3>Designed for unorganized work providers and seekers. Digitize your work, manage contracts, and track payments effortlessly.</h3>
+          <h3>Designed for unorganized work providers and seekers. Digitize your work by creating contracts, manage contracts and settle payments effortlessly.</h3>
           <a href="https://play.google.com/store/games?hl=en&pli=1" className="cta-button">
             <img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Get it on Google Play" height="60" />
           </a>
+          <span className="coming-soon-badge">Coming Soon</span>
         </div>
         <div className="hero-image">
           
@@ -91,7 +89,7 @@ const MainContent = () => {
         <div className="intro-content">
           <h2>Why Choose Work_Wallet?</h2>
           <ul id="lists">
-            <li>Digitize your work payments and contracts.</li>
+            <li>Digitize your work payments by creating contracts.</li>
             <li>Manage workers and payments seamlessly.</li>
             <li>Analytics to track your work finances.</li>
           </ul>
@@ -121,7 +119,7 @@ const MainContent = () => {
           <div className="team-grid">
             <div className="team-member">
               <img src={anil} alt="Team Member" />
-              <h3>Anilkumar A Goud</h3>
+              <h3>AnilkumarA Goud</h3>
               <p>CEO & Founder</p>
             </div>
           </div>
@@ -175,7 +173,7 @@ const MainContent = () => {
         <div className="footer-content">
           <div className="footer-section">
             <h3>About Us</h3>
-            <p>Work Wallet is your comprehensive solution for managing work and finances in the digital age.</p>
+            <p>Work Wallet is your comprehensive solution for managing work payments in the digital age.</p>
           </div>
           <div className="footer-section">
             <h3>Quick Links</h3>

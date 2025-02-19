@@ -179,7 +179,10 @@ const ContractDetailsPage = () => {
           <strong>members:</strong> {contract.members.join(', ')}
         </p>
         <p>
-          <strong>Amount:</strong> ₹{contract.amount}
+          <strong>Amount per person:</strong> ₹{contract.amount}
+        </p>
+        <p>
+          <strong>Total:</strong> ₹{contract.total}
         </p>
         <p>
           <strong>Start Date:</strong> {formatDate(contract.start_date)}
